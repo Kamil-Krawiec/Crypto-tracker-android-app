@@ -1,4 +1,4 @@
-package com.example.cryptotracker.database
+package com.example.cryptotracker.data.database
 
 import androidx.room.Database
 import androidx.room.RoomDatabase
