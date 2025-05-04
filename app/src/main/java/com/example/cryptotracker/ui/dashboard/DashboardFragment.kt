@@ -1,38 +1,48 @@
+// app/src/main/java/com/example/cryptotracker/ui/dashboard/DashboardFragment.kt
 package com.example.cryptotracker.ui.dashboard
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cryptotracker.R
+import com.example.cryptotracker.data.database.CryptoDatabase
+import com.example.cryptotracker.data.repository.CryptoRepository
 import com.example.cryptotracker.databinding.FragmentDashboardBinding
 
-class DashboardFragment : Fragment() {
+class DashboardFragment : Fragment(R.layout.fragment_dashboard) {
 
     private var _binding: FragmentDashboardBinding? = null
-
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+    private val viewModel: DashboardViewModel by viewModels {
+        DashboardViewModel.Factory(
+            CryptoRepository(
+                CryptoDatabase
+                    .getInstance(requireContext())
+                    .assetDao()
+            )
+        )
+    }
 
-        _binding = FragmentDashboardBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    private val adapter = DashboardAdapter()
 
-        val textView: TextView = binding.textDashboard
-        dashboardViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        _binding = FragmentDashboardBinding.bind(view)
+
+        // Setup RecyclerView
+        binding.rvDashboard.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@DashboardFragment.adapter
         }
-        return root
+
+        // Observe and submit list
+        viewModel.portfolioUiState.observe(viewLifecycleOwner) { list ->
+            adapter.submitList(list)
+        }
     }
 
     override fun onDestroyView() {

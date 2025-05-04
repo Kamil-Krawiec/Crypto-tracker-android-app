@@ -1,42 +1,51 @@
+// app/src/main/java/com/example/cryptotracker/ui/notifications/NotificationsFragment.kt
 package com.example.cryptotracker.ui.notifications
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.cryptotracker.R
+import com.example.cryptotracker.data.database.CryptoDatabase
+import com.example.cryptotracker.data.repository.AlertRepository
 import com.example.cryptotracker.databinding.FragmentNotificationsBinding
 
-class NotificationsFragment : Fragment() {
+class NotificationsFragment : Fragment(R.layout.fragment_notifications) {
 
-    private var _binding: FragmentNotificationsBinding? = null
+    private var _bind: FragmentNotificationsBinding? = null
+    private val binding get() = _bind!!
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
-    private val binding get() = _binding!!
+    private val viewModel: NotificationsViewModel by viewModels {
+        NotificationsViewModel.Factory(
+            AlertRepository(
+                CryptoDatabase.getInstance(requireContext()).alertDao()
+            )
+        )
+    }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        val notificationsViewModel =
-            ViewModelProvider(this).get(NotificationsViewModel::class.java)
+    private val adapter by lazy {
+        AlertAdapter(
+            onClick  = { alert -> viewModel.markSeen(alert) },
+            onDelete = { alert -> viewModel.deleteAlert(alert) }
+        )
+    }
 
-        _binding = FragmentNotificationsBinding.inflate(inflater, container, false)
-        val root: View = binding.root
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        _bind = FragmentNotificationsBinding.bind(view)
 
-        val textView: TextView = binding.textNotifications
-        notificationsViewModel.text.observe(viewLifecycleOwner) {
-            textView.text = it
+        binding.rvAlerts.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@NotificationsFragment.adapter
         }
-        return root
+
+        viewModel.alerts.observe(viewLifecycleOwner) { list ->
+            adapter.submitList(list)
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        _binding = null
+        _bind = null
     }
 }

@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/cryptotracker/data/dao/AssetDao.kt
 package com.example.cryptotracker.data.dao
 
 import androidx.room.*
@@ -7,19 +8,23 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface AssetDao {
 
-    /** Stream all saved assets as a Flow **/
+    /** Stream all saved assets **/
     @Query("SELECT * FROM assets")
-    fun observeAllAssets(): Flow<List<CryptoAsset>>
+    fun getAllAssetsFlow(): Flow<List<CryptoAsset>>
 
-    /** Insert or replace an asset (no suspend) **/
+    /** One-time load of all assets **/
+    @Query("SELECT * FROM assets")
+    suspend fun getAllAssetsOnce(): List<CryptoAsset>
+
+    /** Insert or replace an asset, returns its row ID **/
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun upsert(asset: CryptoAsset)
+    suspend fun upsert(asset: CryptoAsset): Long
 
-    /** Delete an asset (no suspend) **/
+    /** Delete an asset, returns # of rows deleted **/
     @Delete
-    fun delete(asset: CryptoAsset)
+    suspend fun delete(asset: CryptoAsset): Int
 
-    /** (Optional) Update an existing asset **/
+    /** Update an existing asset, returns # of rows updated **/
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    fun update(asset: CryptoAsset): Int
+    suspend fun update(asset: CryptoAsset): Int
 }
