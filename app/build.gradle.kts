@@ -5,6 +5,7 @@ plugins {
     id("org.jetbrains.kotlin.kapt")        // Hilt / Dagger
     id("com.google.devtools.ksp")          // Room & Moshi
     id("androidx.navigation.safeargs.kotlin")
+    alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -30,6 +31,7 @@ android {
         }
     }
 
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
@@ -37,9 +39,13 @@ android {
     kotlinOptions { jvmTarget = "17" }
 
     buildFeatures {
+        compose = true
         viewBinding = true
         //noinspection DataBindingWithoutKapt
         dataBinding = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.0"
     }
 }
 
@@ -90,4 +96,30 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Compose BOM
+    implementation(platform(libs.androidx.compose.bom))
+
+    // Core dependencies
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
+
+    // Compose UI core libraries
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.ui.tooling)
+    implementation(libs.androidx.ui.tooling.preview)
+    implementation(libs.androidx.foundation)
+
+    // LiveData integration for Compose
+    implementation(libs.androidx.runtime.livedata)
+
+    // Material icons (extended set)
+    implementation(libs.androidx.material.icons.extended)
+
+    implementation(libs.material3)
+    implementation(libs.ui)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity.compose.v170)
 }

@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/cryptotracker/ui/notifications/NotificationsViewModel.kt
 package com.example.cryptotracker.ui.notifications
 
 import androidx.lifecycle.*
@@ -21,7 +20,7 @@ class NotificationsViewModel(
 
     fun deleteAlert(alert: PriceAlert) {
         viewModelScope.launch {
-            repo.delete(alert)
+            repo.deleteAlert(alert)
         }
     }
 

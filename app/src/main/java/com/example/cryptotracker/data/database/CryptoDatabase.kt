@@ -11,7 +11,7 @@ import com.example.cryptotracker.data.entity.PriceAlert
 
 @Database(
     entities = [CryptoAsset::class, PriceAlert::class],
-    version = 1,
+    version = 3,
     exportSchema = false
 )
 abstract class CryptoDatabase : RoomDatabase() {

@@ -11,4 +11,8 @@ interface CryptoApi {
     suspend fun getPrice(
         @Query("symbol") symbol: String
     ): TickerResponse
+
+    @GET("api/v3/ticker/price")
+    suspend fun getAllPrices(): List<TickerResponse>
+
 }

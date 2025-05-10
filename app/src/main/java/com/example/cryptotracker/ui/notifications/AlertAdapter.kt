@@ -1,4 +1,3 @@
-// app/src/main/java/com/example/cryptotracker/ui/notifications/AlertAdapter.kt
 package com.example.cryptotracker.ui.notifications
 
 import android.view.LayoutInflater
@@ -14,7 +13,7 @@ class AlertAdapter(
     private val onDelete: (PriceAlert) -> Unit
 ) : ListAdapter<PriceAlert, AlertAdapter.ViewHolder>(Diff()) {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder =
         ViewHolder(
             ItemAlertBinding.inflate(
                 LayoutInflater.from(parent.context),
@@ -35,22 +34,22 @@ class AlertAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(alert: PriceAlert) = with(binding) {
             tvAlertSymbol.text = alert.symbol
-            val op = if (alert.above) "≥" else "≤"
-            tvAlertThreshold.text = "$op ${"%.2f".format(alert.threshold)}"
+            val op = if (alert.isAboveThreshold) "≥" else "≤"
+            tvAlertThreshold.text = "$op ${"%.2f".format(alert.targetPrice)}"
 
             root.setOnClickListener { onClick(alert) }
             ivAlertDelete.setOnClickListener { onDelete(alert) }
 
-            // gray out if already seen
-            alpha = if (alert.seen) 0.5f else 1f
+            // Gray out if already seen
+            root.alpha = if (alert.seen) 0.5f else 1f
         }
     }
 
     class Diff : DiffUtil.ItemCallback<PriceAlert>() {
-        override fun areItemsTheSame(old: PriceAlert, new: PriceAlert) =
+        override fun areItemsTheSame(old: PriceAlert, new: PriceAlert): Boolean =
             old.id == new.id
 
-        override fun areContentsTheSame(old: PriceAlert, new: PriceAlert) =
+        override fun areContentsTheSame(old: PriceAlert, new: PriceAlert): Boolean =
             old == new
     }
 }

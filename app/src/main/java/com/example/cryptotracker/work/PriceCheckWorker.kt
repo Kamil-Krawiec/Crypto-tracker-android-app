@@ -16,7 +16,7 @@ class PriceCheckWorker(
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
             val dao  = CryptoDatabase.getInstance(applicationContext).assetDao()
-            val repo = CryptoRepository(dao)
+            CryptoRepository(dao)
             // TODO: fetch live prices and update your local DB or fire alerts
             Result.success()
         } catch (e: Exception) {
