@@ -1,5 +1,8 @@
+// app/src/main/java/com/example/cryptotracker/ui/notifications/NotificationsScreen.kt
 package com.example.cryptotracker.ui.notifications
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,28 +11,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cryptotracker.data.entity.PriceAlert
 import com.example.cryptotracker.data.repository.AlertRepository
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
     alertRepo: AlertRepository,
     onAddClick: () -> Unit = {},
-    onAlertClick: (PriceAlert) -> Unit = {},
-    onDeleteClick: (PriceAlert) -> Unit = {}
+    onAlertClick: (Long) -> Unit = {},       // pass alertId
+    onDeleteClick: (Long) -> Unit = {}       // pass alertId
 ) {
+    // 1) get our ViewModel
     val viewModel: NotificationsViewModel = viewModel(
         factory = NotificationsViewModel.Factory(alertRepo)
     )
-    // Observe the LiveData<List<PriceAlert>>
-    val alerts by viewModel.alerts.observeAsState(initial = emptyList<PriceAlert>())
+    // 2) collect the StateFlow
+    val alerts by viewModel.alerts.collectAsState()
 
     Scaffold(
         topBar = {
@@ -58,7 +60,11 @@ fun NotificationsScreen(
                     ) {
                         Column(
                             modifier = Modifier
-                                .clickable { onAlertClick(alert) }
+                                .weight(1f)
+                                .clickable {
+                                    viewModel.markSeen(alert)
+                                    onAlertClick(alert.id)
+                                }
                         ) {
                             Text(alert.symbol, style = MaterialTheme.typography.titleMedium)
                             Spacer(Modifier.height(4.dp))
@@ -68,7 +74,10 @@ fun NotificationsScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        IconButton(onClick = { onDeleteClick(alert) }) {
+                        IconButton(onClick = {
+                            viewModel.deleteAlert(alert)
+                            onDeleteClick(alert.id)
+                        }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")
                         }
                     }

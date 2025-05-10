@@ -1,6 +1,8 @@
 // app/src/main/java/com/example/cryptotracker/ui/makealert/MakeAlertScreen.kt
 package com.example.cryptotracker.ui.makealert
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -15,6 +17,7 @@ import kotlinx.coroutines.launch
 import com.example.cryptotracker.data.entity.PriceAlert
 import com.example.cryptotracker.data.repository.AlertRepository
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MakeAlertScreen(

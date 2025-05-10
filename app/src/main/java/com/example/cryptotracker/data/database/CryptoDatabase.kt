@@ -1,9 +1,9 @@
+// app/src/main/java/com/example/cryptotracker/data/database/CryptoDatabase.kt
 package com.example.cryptotracker.data.database
 
 import android.content.Context
-import androidx.room.Database
-import androidx.room.Room
-import androidx.room.RoomDatabase
+import androidx.room.*
+import com.example.cryptotracker.data.Converters
 import com.example.cryptotracker.data.dao.AssetDao
 import com.example.cryptotracker.data.dao.AlertDao
 import com.example.cryptotracker.data.entity.CryptoAsset
@@ -14,6 +14,7 @@ import com.example.cryptotracker.data.entity.PriceAlert
     version = 3,
     exportSchema = false
 )
+@TypeConverters(Converters::class)
 abstract class CryptoDatabase : RoomDatabase() {
     abstract fun assetDao(): AssetDao
     abstract fun alertDao(): AlertDao
@@ -26,11 +27,14 @@ abstract class CryptoDatabase : RoomDatabase() {
                 INSTANCE ?: buildDatabase(context).also { INSTANCE = it }
             }
 
-        private fun buildDatabase(context: Context) =
+        private fun buildDatabase(context: Context): CryptoDatabase =
             Room.databaseBuilder(
                 context.applicationContext,
                 CryptoDatabase::class.java,
                 "crypto_tracker_db"
-            ).build()
+            )
+                // whenever version increases, Room will drop & recreate all tables
+                .fallbackToDestructiveMigration()
+                .build()
     }
 }

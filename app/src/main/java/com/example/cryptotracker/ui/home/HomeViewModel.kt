@@ -1,54 +1,66 @@
-// app/src/main/java/com/example/cryptotracker/ui/home/HomeViewModel.kt
 package com.example.cryptotracker.ui.home
 
-import androidx.lifecycle.*
-import com.example.cryptotracker.data.entity.CryptoAsset
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.cryptotracker.data.repository.CryptoRepository
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.map
+import com.example.cryptotracker.data.repository.Resource
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+
+data class HomeItem(
+    val symbol: String,
+    val livePrice: Double
+)
+
+data class HomeUiState(
+    val isLoading: Boolean = true,
+    val items: List<HomeItem> = emptyList(),
+    val errorMessage: String? = null
+)
 
 class HomeViewModel(
     private val repo: CryptoRepository
 ) : ViewModel() {
 
-    /**
-     * Stream of HomeItem(symbol, livePrice)
-     * built from the stored assets + live prices from network.
-     */
-    val assetsUiState: LiveData<List<HomeItem>> = repo.getAllAssets()
-        .map { assets ->
-            assets.map { asset ->
-                // fetch the live price for each symbol
-                HomeItem(
-                    symbol = asset.symbol,
-                    livePrice = repo.getLivePrice(asset.symbol)
-                )
+    private val _uiState = MutableStateFlow(HomeUiState())
+    val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            repo.getLivePrices().collect { result ->
+                when (result) {
+                    is Resource.Loading -> {
+                        _uiState.value = HomeUiState(isLoading = true)
+                    }
+                    is Resource.Success -> {
+                        // map each "SYMBOLUSDT" → HomeItem("SYMBOL", price)
+                        val items = result.data
+                            .mapNotNull { (symbol, price) ->
+                                symbol.takeIf { it.endsWith("USDT") }?.removeSuffix("USDT")?.let {
+                                    HomeItem(it, price)
+                                }
+                            }
+                        _uiState.value = HomeUiState(isLoading = false, items = items)
+                    }
+                    is Resource.Error -> {
+                        _uiState.value = HomeUiState(
+                            isLoading = false,
+                            errorMessage = result.exception.localizedMessage
+                        )
+                    }
+                }
             }
         }
-        .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
-        .asLiveData()
-
-    /** Add a new tracked asset (not used here, but kept for symmetry) */
-    fun addAsset(symbol: String, qty: Double, price: Double) {
-        viewModelScope.launch {
-            repo.upsertAsset(CryptoAsset(1,symbol, qty, price))
-        }
     }
 
-    fun deleteAsset(asset: CryptoAsset) {
-        // no-op or implement if you allow deleting from this list
-    }
-
-    class Factory(private val repo: CryptoRepository) :
-        ViewModelProvider.Factory {
+    class Factory(private val repo: CryptoRepository) : ViewModelProvider.Factory {
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             if (modelClass.isAssignableFrom(HomeViewModel::class.java)) {
                 @Suppress("UNCHECKED_CAST")
                 return HomeViewModel(repo) as T
             }
-            throw IllegalArgumentException("Unknown VM class")
+            throw IllegalArgumentException("Unknown ViewModel class")
         }
     }
 }

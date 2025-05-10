@@ -1,3 +1,4 @@
+// app/src/main/java/com/example/cryptotracker/ui/dashboard/DashboardScreen.kt
 package com.example.cryptotracker.ui.dashboard
 
 import androidx.compose.foundation.layout.*
@@ -5,27 +6,26 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.livedata.observeAsState
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.cryptotracker.data.repository.CryptoRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cryptotracker.data.repository.CryptoRepository
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     cryptoRepo: CryptoRepository
 ) {
-    val viewModel: DashboardViewModel = viewModel(
+    // get or create our ViewModel, passing in the repo
+    val vm: DashboardViewModel = viewModel(
         factory = DashboardViewModel.Factory(cryptoRepo)
     )
-    val items by viewModel.portfolioUiState.observeAsState(emptyList())
+    // collect the UI state
+    val items by vm.uiState.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("My Portfolio") })
-        }
+        topBar = { TopAppBar(title = { Text("My Portfolio") }) }
     ) { padding ->
         LazyColumn(
             contentPadding = padding,
@@ -51,7 +51,7 @@ fun DashboardScreen(
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        val pl = item.profitLoss
+                        val pl = (item.livePrice - item.purchasePrice) * item.quantity
                         Text(
                             text = "${if (pl >= 0) "+" else "-"}$${"%.2f".format(kotlin.math.abs(pl))}",
                             color = if (pl >= 0)
