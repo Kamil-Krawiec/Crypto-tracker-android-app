@@ -11,14 +11,18 @@ composeBom = "2025.05.00"
 constraintlayoutVersion = "2.1.4"
 coreKtxVersion = "1.9.0"
 espressoCoreVersion = "3.5.1"
-hiltCompiler = "2.44"
-kotlin = "2.0.21"
+hiltAndroid = "2.49"
+hiltAndroidCompiler = "2.49"
+hiltCompiler = "2.49"
+hiltNavigationCompose = "1.2.0"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
-kotlinStdlib = "2.1.10"
+kotlin                        = "1.9.0"
+kotlinStdlib                  = "1.9.0"
+ksp                           = "1.9.10-1.0.13"
 kotlinxCoroutinesAndroid = "1.7.3"
 kotlinxCoroutinesCore = "1.7.0"
 kotlinxSerializationJson = "1.0.1"
@@ -47,6 +51,8 @@ roomRuntimeVersion = "2.5.0"
 ui = "1.8.1"
 uiToolingPreview = "1.8.1"
 workRuntimeKtx = "2.10.1"
+hilt        = "2.49"
+navigation  = "2.8.9"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -58,6 +64,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-core-ktx-v190 = { module = "androidx.core:core-ktx", version.ref = "coreKtxVersion" }
 androidx-espresso-core-v351 = { module = "androidx.test.espresso:espresso-core", version.ref = "espressoCoreVersion" }
 androidx-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-junit-v115 = { module = "androidx.test.ext:junit", version.ref = "androidxJunit" }
 androidx-lifecycle-livedata-ktx-v260 = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtxVersion" }
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
@@ -82,6 +89,8 @@ androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview
 androidx-work-runtime-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "workRuntimeKtx" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofit" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroidCompiler" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltCompiler" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
@@ -108,8 +117,10 @@ retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit
 ui = { module = "androidx.compose.ui:ui", version.ref = "ui" }
 ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 
-[plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
+[plugins]
+android-application      = { id = "com.android.application",            version.ref = "agp" }
+kotlin-android           = { id = "org.jetbrains.kotlin.android",       version.ref = "kotlin" }
+ksp                      = { id = "com.google.devtools.ksp",           version.ref = "ksp" }
+hilt-android             = { id = "com.google.dagger.hilt.android",    version.ref = "hilt" }
+androidx-safeargs-kotlin = { id = "androidx.navigation.safeargs.kotlin", version.ref = "navigation" }

@@ -2,12 +2,13 @@
 package com.example.cryptotracker.ui.dashboard
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.cryptotracker.data.repository.CryptoRepository
+import com.example.cryptotracker.data.repository.Resource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class DashboardItem(
     val symbol: String,
@@ -16,25 +17,28 @@ data class DashboardItem(
     val livePrice: Double
 )
 
-class DashboardViewModel(
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
     private val repo: CryptoRepository
 ) : ViewModel() {
 
-    /** Emits a new List<DashboardItem> whenever assets or their live prices change */
+    // emit a list of DashboardItem whenever prices or assets change
     @OptIn(ExperimentalCoroutinesApi::class)
     val uiState: StateFlow<List<DashboardItem>> =
         repo.getAllAssets()
             .flatMapLatest { assets ->
-                flow {
-                    val items = assets.map { asset ->
-                        DashboardItem(
-                            symbol        = asset.symbol,
-                            quantity      = asset.quantity,
-                            purchasePrice = asset.purchasePrice,
-                            livePrice     = repo.getLivePrice(asset.symbol)
-                        )
-                    }
-                    emit(items)
+                repo.getLivePrices().map { resource ->
+                    if (resource is Resource.Success) {
+                        val prices = resource.data
+                        assets.map { asset ->
+                            DashboardItem(
+                                symbol        = asset.symbol,
+                                quantity      = asset.quantity,
+                                purchasePrice = asset.purchasePrice,
+                                livePrice     = prices["${asset.symbol.uppercase()}USDT"] ?: 0.0
+                            )
+                        }
+                    } else emptyList()
                 }
             }
             .stateIn(
@@ -42,15 +46,4 @@ class DashboardViewModel(
                 started = SharingStarted.Lazily,
                 initialValue = emptyList()
             )
-
-    /** Factory so Compose can create this VM with our repo */
-    class Factory(private val repo: CryptoRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return DashboardViewModel(repo) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
-    }
 }

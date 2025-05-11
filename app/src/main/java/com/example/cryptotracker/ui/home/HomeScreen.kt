@@ -6,35 +6,47 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cryptotracker.data.repository.CryptoRepository
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    cryptoRepo: CryptoRepository,
-    onPortfolioClick: () -> Unit = {}
+    onPortfolioClick: () -> Unit,
+    onAlertsClick:    () -> Unit
 ) {
-    val vm: HomeViewModel = viewModel(
-        factory = HomeViewModel.Factory(cryptoRepo)
-    )
+    // Hilt provides your ViewModel under the hood
+    val vm: HomeViewModel = hiltViewModel()
     val state by vm.uiState.collectAsState()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Market Overview") }) },
+        topBar = {
+            TopAppBar(
+                title   = { Text("Market Overview") },
+                actions = {
+                    IconButton(onClick = onAlertsClick) {
+                        Icon(Icons.Default.Notifications, contentDescription = "Alerts")
+                    }
+                }
+            )
+        },
         floatingActionButton = {
             FloatingActionButton(onClick = onPortfolioClick) {
                 Icon(Icons.Default.ShowChart, contentDescription = "Go to Portfolio")
             }
         }
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
+        Box(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             when {
                 state.isLoading -> {
                     CircularProgressIndicator(Modifier.align(Alignment.Center))
@@ -60,7 +72,9 @@ fun HomeScreen(
                                     .clickable { /* TODO: detail */ }
                             ) {
                                 Row(
-                                    Modifier.padding(16.dp).fillMaxWidth(),
+                                    Modifier
+                                        .padding(16.dp)
+                                        .fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically
                                 ) {

@@ -31,6 +31,7 @@ class PriceCheckWorker(
 ) : CoroutineWorker(appContext, params) {
 
     companion object {
+        const val WORK_NAME = "price_check_work"
         private const val CHANNEL_ID   = "price_alerts"
         private const val CHANNEL_NAME = "Price Alerts"
     }

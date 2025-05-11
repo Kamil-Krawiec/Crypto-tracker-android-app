@@ -1,0 +1,8 @@
+JvmtiExport can_access_local_variables 0
+JvmtiExport can_hotswap_or_post_breakpoint 0
+JvmtiExport can_post_on_exceptions 0
+# 342 ciObject found
+instanceKlass org/jetbrains/org/objectweb/asm/ClassReader
+ciMethodData java/lang/Object <init> ()V 2 275389092 orig 80 1 0 0 0 0 0 0 0 0 0 0 0 0 80 245 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 data 4 0x0 0x9 0x1 0x0 oops 0 methods 0
+ciMethodData java/lang/String isLatin1 ()Z 2 72248021 orig 80 1 0 0 0 1 0 0 0 0 0 0 0 0 80 245 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 3 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 data 18 0x30007 0x0 0x58 0x44e53c0 0x80000006000a0007 0x4c3def 0x38 0x400de37 0xe0003 0x4027e07 0x18 0x0 0x0 0x0 0x0 0x9 0x1 0x0 oops 0 methods 0
+ciMethodData java/lang/String equals (Ljava/lang/Object;)Z 2 89300 orig 80 3 0 0 0 1 0 0 0 0 0 0 0 0 80 245 3 0 1 0 0 4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 data 49 0x20007 0x10650 0x20 0x5705 0xffffffff00080104 0xffffffffffffff29 0x0 0x13d102680 0x10496 0x3381d93f0 0x7c 0xb0007 0x182 0xe0 0x10495 0xf0004 0x0 0x0 0x13d102680 0x10482 0x0 0x0 0x160007 0x0 0x40 0x10497 0x8000000600210007 0x23e 0x68 0x102d0 0x2c0002 0x10270 0x2f0007 0x94ac 0x38 0x6de5 0x330003 0x6de5 0x18 0x0 0x0 0x0 0x0 0x0 0x0 0x9 0x2 0x0 0x0 oops 3

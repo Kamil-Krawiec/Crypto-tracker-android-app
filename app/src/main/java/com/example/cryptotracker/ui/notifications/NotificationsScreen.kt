@@ -14,29 +14,22 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cryptotracker.data.repository.AlertRepository
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationsScreen(
-    alertRepo: AlertRepository,
-    onAddClick: () -> Unit = {},
-    onAlertClick: (Long) -> Unit = {},       // pass alertId
-    onDeleteClick: (Long) -> Unit = {}       // pass alertId
+    onAddClick:    () -> Unit,
+    onAlertClick:  (Long) -> Unit,
+    onDeleteClick: (Long) -> Unit
 ) {
-    // 1) get our ViewModel
-    val viewModel: NotificationsViewModel = viewModel(
-        factory = NotificationsViewModel.Factory(alertRepo)
-    )
-    // 2) collect the StateFlow
-    val alerts by viewModel.alerts.collectAsState()
+    // Hilt provides your VM (injects AlertRepository)
+    val vm: NotificationsViewModel = hiltViewModel()
+    val alerts by vm.alerts.collectAsState()
 
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Price Alerts") })
-        },
+        topBar = { TopAppBar(title = { Text("Price Alerts") }) },
         floatingActionButton = {
             FloatingActionButton(onClick = onAddClick) {
                 Icon(Icons.Filled.Add, contentDescription = "Add Alert")
@@ -62,7 +55,7 @@ fun NotificationsScreen(
                             modifier = Modifier
                                 .weight(1f)
                                 .clickable {
-                                    viewModel.markSeen(alert)
+                                    vm.markSeen(alert)
                                     onAlertClick(alert.id)
                                 }
                         ) {
@@ -75,7 +68,7 @@ fun NotificationsScreen(
                             )
                         }
                         IconButton(onClick = {
-                            viewModel.deleteAlert(alert)
+                            vm.deleteAlert(alert)
                             onDeleteClick(alert.id)
                         }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Delete")

@@ -1,30 +1,24 @@
-package com.example.cryptotracker.ui.makealert
+package com.example.cryptotracker.ui.alertDetail
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.cryptotracker.data.entity.PriceAlert
-import com.example.cryptotracker.data.repository.AlertRepository
+import androidx.hilt.navigation.compose.hiltViewModel
+import kotlin.text.format
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AlertDetailScreen(
-    alertId: Long,
-    alertRepo: AlertRepository,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    viewModel: AlertDetailViewModel = hiltViewModel()
 ) {
-    // load the alert from your repo
-    val alert by produceState(
-        initialValue = null as PriceAlert?,
-        key1 = alertId
-    ) {
-        value = alertRepo.getAllAlertsOnce().find { it.id == alertId }
-    }
+    val alert by viewModel.alert.collectAsState()
 
     Scaffold(
         topBar = {
@@ -33,6 +27,13 @@ fun AlertDetailScreen(
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    alert?.let {
+                        IconButton(onClick = { viewModel.deleteAlert(); onBack() }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete")
+                        }
                     }
                 }
             )
@@ -43,25 +44,25 @@ fun AlertDetailScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(16.dp)
+                    .padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Text("Symbol: ${a.symbol}", style = MaterialTheme.typography.titleLarge)
-                Spacer(Modifier.height(8.dp))
-                Text("Target Price: ${a.targetPrice}", style = MaterialTheme.typography.bodyLarge)
-                Spacer(Modifier.height(8.dp))
+                Text("Target: $${"%.2f".format(a.targetPrice)}", style = MaterialTheme.typography.bodyLarge)
                 Text(
                     "When ${if (a.isAboveThreshold) "above" else "below"} threshold",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                Spacer(Modifier.height(8.dp))
                 Text("Created: ${a.createdAt}", style = MaterialTheme.typography.bodySmall)
                 a.triggeredAt?.let {
-                    Spacer(Modifier.height(8.dp))
                     Text("Triggered: $it", style = MaterialTheme.typography.bodySmall)
+                }
+                Spacer(Modifier.weight(1f))
+                Button(onClick = { viewModel.markSeen() }) {
+                    Text("Mark as Seen")
                 }
             }
         } ?: run {
-            // still loading or not found
             Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }

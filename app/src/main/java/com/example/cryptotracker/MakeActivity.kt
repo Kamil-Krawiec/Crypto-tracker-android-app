@@ -7,25 +7,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.material3.Surface
-import com.example.cryptotracker.data.database.CryptoDatabase
-import com.example.cryptotracker.data.network.NetworkModule
-import com.example.cryptotracker.data.repository.AlertRepository
-import com.example.cryptotracker.ui.makealert.MakeAlertScreen
+import com.example.cryptotracker.ui.makeAlert.MakeAlertScreen
 import com.example.cryptotracker.ui.theme.CryptoTrackerTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MakeActivity : ComponentActivity() {
-
-    // singletons for DB and API
-    private val database by lazy { CryptoDatabase.getInstance(this) }
-    private val api      by lazy { NetworkModule.getApi(this) }
-
-    // now passes both DAO + API
-    private val alertRepo by lazy {
-        AlertRepository(
-            dao = database.alertDao(),
-            api = api
-        )
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,8 +21,7 @@ class MakeActivity : ComponentActivity() {
             CryptoTrackerTheme {
                 Surface {
                     MakeAlertScreen(
-                        alertRepo = alertRepo,
-                        onDone    = { finish() }
+                        onDone = { finish() }
                     )
                 }
             }

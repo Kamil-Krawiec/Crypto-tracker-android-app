@@ -1,11 +1,18 @@
 // app/build.gradle.kts  ── module ---------------------------------------------
 plugins {
+    // Android & Kotlin
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.kapt")        // Hilt / Dagger
-    id("com.google.devtools.ksp")          // Room & Moshi
+    kotlin("android")
+    kotlin("kapt")
+    // KSP for Room & Moshi
+    id("com.google.devtools.ksp")
+
+    // Safe Args
     id("androidx.navigation.safeargs.kotlin")
-    alias(libs.plugins.kotlin.compose)
+
+    // Hilt
+    id("com.google.dagger.hilt.android")
+
 }
 
 android {
@@ -36,17 +43,24 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
     buildFeatures {
         compose = true
         viewBinding = true
-        //noinspection DataBindingWithoutKapt
-        dataBinding = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.0"
+        kotlinCompilerExtensionVersion = "1.5.3"
+//        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+
     }
+}
+
+kapt {
+    correctErrorTypes       = true
+    mapDiagnosticLocations  = true
 }
 
 dependencies {
@@ -69,8 +83,6 @@ dependencies {
     implementation(libs.moshi.kotlin)
     ksp(libs.moshi.kotlin.codegen)
 
-    /* ---------- Dagger / Hilt (kapt) ---------- */
-    kapt(libs.hilt.compiler)
 
     /* ---------- Retrofit + OkHttp ---------- */
     implementation(libs.retrofit)
@@ -122,4 +134,11 @@ dependencies {
     implementation(libs.ui.tooling.preview)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose.v170)
+
+    // Hilt runtime
+    implementation(libs.hilt.android)
+    // Hilt compiler (annotation processor)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
+
 }

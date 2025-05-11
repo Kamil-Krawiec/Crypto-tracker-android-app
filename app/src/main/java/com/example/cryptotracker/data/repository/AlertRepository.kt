@@ -8,13 +8,17 @@ import com.example.cryptotracker.data.entity.PriceAlert
 import com.example.cryptotracker.data.network.CryptoApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.Instant
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AlertRepository(
+@Singleton
+class AlertRepository @Inject constructor(
     private val dao: AlertDao,
     private val api: CryptoApi
-) {
+)  {
 
     /** Streams all alerts as a Flow **/
     fun getAllAlerts(): Flow<List<PriceAlert>> =
@@ -78,6 +82,10 @@ class AlertRepository(
 
         fired
     }
+
+    fun getAlertById(id: Long): Flow<PriceAlert?> =
+        dao.getAllAlertsFlow()
+            .map { list -> list.find { it.id == id } }
 
     /** Utility extension: treat null or NaN as zero */
     private fun Double?.orZero(): Double = this?.takeIf { !it.isNaN() } ?: 0.0

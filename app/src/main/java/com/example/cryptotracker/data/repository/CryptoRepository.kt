@@ -8,11 +8,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.*
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class CryptoRepository(
+@Singleton
+class CryptoRepository @Inject constructor(
     private val dao: AssetDao,
     private val api: CryptoApi
-) {
+){
     fun getAllAssets(): Flow<List<CryptoAsset>> =
         dao.getAllAssetsFlow()
 

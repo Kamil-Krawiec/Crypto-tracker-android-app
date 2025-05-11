@@ -4,28 +4,35 @@ package com.example.cryptotracker.ui.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.cryptotracker.data.repository.CryptoRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
-    cryptoRepo: CryptoRepository
+    onBack: () -> Unit
 ) {
-    // get or create our ViewModel, passing in the repo
-    val vm: DashboardViewModel = viewModel(
-        factory = DashboardViewModel.Factory(cryptoRepo)
-    )
-    // collect the UI state
+    // Hilt will provide the repo into your @HiltViewModel
+    val vm: DashboardViewModel = hiltViewModel()
     val items by vm.uiState.collectAsState()
 
     Scaffold(
-        topBar = { TopAppBar(title = { Text("My Portfolio") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("My Portfolio") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+        }
     ) { padding ->
         LazyColumn(
             contentPadding = padding,
@@ -37,7 +44,7 @@ fun DashboardScreen(
             items(items, key = { it.symbol }) { item ->
                 Card(modifier = Modifier.fillMaxWidth()) {
                     Row(
-                        Modifier
+                        modifier = Modifier
                             .padding(16.dp)
                             .fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,

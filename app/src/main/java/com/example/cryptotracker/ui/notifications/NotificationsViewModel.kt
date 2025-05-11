@@ -4,44 +4,32 @@ package com.example.cryptotracker.ui.notifications
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.cryptotracker.data.entity.PriceAlert
 import com.example.cryptotracker.data.repository.AlertRepository
+import com.example.cryptotracker.data.entity.PriceAlert
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class NotificationsViewModel(
+@HiltViewModel
+class NotificationsViewModel @Inject constructor(
     private val repo: AlertRepository
 ) : ViewModel() {
 
-    /** Compose can call collectAsState() on this **/
+    /** Compose can collect this via collectAsState() **/
     val alerts: StateFlow<List<PriceAlert>> =
         repo.getAllAlerts()
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     @RequiresApi(Build.VERSION_CODES.O)
-    fun markSeen(alert: PriceAlert) {
-        viewModelScope.launch {
-            repo.markAlertSeen(alert.id)
-        }
+    fun markSeen(alert: PriceAlert) = viewModelScope.launch {
+        repo.markAlertSeen(alert.id)
     }
 
-    fun deleteAlert(alert: PriceAlert) {
-        viewModelScope.launch {
-            repo.deleteAlert(alert)
-        }
-    }
-
-    class Factory(private val repo: AlertRepository) : ViewModelProvider.Factory {
-        override fun <T : ViewModel> create(modelClass: Class<T>): T {
-            if (modelClass.isAssignableFrom(NotificationsViewModel::class.java)) {
-                @Suppress("UNCHECKED_CAST")
-                return NotificationsViewModel(repo) as T
-            }
-            throw IllegalArgumentException("Unknown ViewModel class")
-        }
+    fun deleteAlert(alert: PriceAlert) = viewModelScope.launch {
+        repo.deleteAlert(alert)
     }
 }
