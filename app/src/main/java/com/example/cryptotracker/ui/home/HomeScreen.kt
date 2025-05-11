@@ -18,12 +18,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    onAlertsClick:    () -> Unit,
     onPortfolioClick: () -> Unit,
-    onAlertsClick:    () -> Unit
+    viewModel: HomeViewModel = hiltViewModel()
 ) {
-    // Hilt provides your ViewModel under the hood
-    val vm: HomeViewModel = hiltViewModel()
-    val state by vm.uiState.collectAsState()
+    val state by viewModel.uiState.collectAsState(initial = HomeUiState(isLoading = true))
 
     Scaffold(
         topBar = {
@@ -69,7 +68,9 @@ fun HomeScreen(
                             Card(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .clickable { /* TODO: detail */ }
+                                    .clickable {
+                                        viewModel.refresh()
+                                    }
                             ) {
                                 Row(
                                     Modifier

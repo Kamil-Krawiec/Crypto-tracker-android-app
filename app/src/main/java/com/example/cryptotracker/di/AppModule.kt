@@ -17,14 +17,13 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
+// app/src/main/java/com/example/cryptotracker/di/AppModule.kt
 @Module
 @InstallIn(SingletonComponent::class)
 object AppModule {
     @Provides @Singleton
     fun provideDatabase(@ApplicationContext ctx: Context): CryptoDatabase =
-        Room.databaseBuilder(ctx, CryptoDatabase::class.java, "crypto_db")
-            .fallbackToDestructiveMigration()
-            .build()
+        CryptoDatabase.getInstance(ctx)
 
     @Provides fun provideAssetDao(db: CryptoDatabase): AssetDao = db.assetDao()
     @Provides fun provideAlertDao(db: CryptoDatabase): AlertDao = db.alertDao()
@@ -34,14 +33,10 @@ object AppModule {
         NetworkModule.getApi(ctx)
 
     @Provides @Singleton
-    fun provideCryptoRepository(
-        dao: AssetDao,
-        api: CryptoApi
-    ): CryptoRepository = CryptoRepository(dao, api)
+    fun provideCryptoRepository(dao: AssetDao, api: CryptoApi): CryptoRepository =
+        CryptoRepository(dao, api)
 
     @Provides @Singleton
-    fun provideAlertRepository(
-        dao: AlertDao,
-        api: CryptoApi
-    ): AlertRepository = AlertRepository(dao, api)
+    fun provideAlertRepository(dao: AlertDao, api: CryptoApi): AlertRepository =
+        AlertRepository(dao, api)
 }

@@ -25,8 +25,8 @@ interface AlertDao {
     @Query("SELECT COUNT(*) FROM alerts WHERE seen = 0")
     fun getUnseenCountFlow(): Flow<Int>
 
-    @Query("UPDATE alerts SET seen = 1, triggeredAt = :now WHERE id = :id")
-    suspend fun markSeen(id: Long, now: java.time.Instant = java.time.Instant.now())
+    @Query("UPDATE alerts SET seen = 1 WHERE id = :id")
+    suspend fun markSeen(id: Long)
 
     @Transaction
     suspend fun deleteAndInsert(replaceList: List<PriceAlert>) {

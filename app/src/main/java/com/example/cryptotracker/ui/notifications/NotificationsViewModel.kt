@@ -32,4 +32,9 @@ class NotificationsViewModel @Inject constructor(
     fun deleteAlert(alert: PriceAlert) = viewModelScope.launch {
         repo.deleteAlert(alert)
     }
+    /** Kick off a one-off check right now */
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun refreshAlerts() = viewModelScope.launch {
+        repo.checkAlerts()
+    }
 }

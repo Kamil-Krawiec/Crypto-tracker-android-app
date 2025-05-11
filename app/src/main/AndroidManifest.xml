@@ -21,12 +21,5 @@
             </intent-filter>
         </activity>
 
-        <!-- Secondary screen for creating alerts -->
-        <activity
-            android:name=".MakeActivity"
-            android:parentActivityName=".MainActivity"
-            android:label="New Alert"
-            android:exported="false" />
-
     </application>
 </manifest>

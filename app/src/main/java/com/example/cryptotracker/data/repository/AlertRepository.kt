@@ -18,7 +18,7 @@ import javax.inject.Singleton
 class AlertRepository @Inject constructor(
     private val dao: AlertDao,
     private val api: CryptoApi
-)  {
+) {
 
     /** Streams all alerts as a Flow **/
     fun getAllAlerts(): Flow<List<PriceAlert>> =
@@ -50,7 +50,7 @@ class AlertRepository @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     suspend fun markAlertSeen(id: Long): Unit =
         withContext(Dispatchers.IO) {
-            dao.markSeen(id, Instant.now())
+            dao.markSeen(id)
         }
 
     /**
@@ -70,16 +70,18 @@ class AlertRepository @Inject constructor(
         val fired = dao.getAllAlertsOnce().filter { alert ->
             pricesMap["${alert.symbol.uppercase()}USDT"]?.let { price ->
                 if (alert.isAboveThreshold) price >= alert.targetPrice
-                else                price <= alert.targetPrice
+                else price <= alert.targetPrice
             } ?: false
         }
 
         // 3. Update each fired alert: mark seen & set triggeredAt
-        fired.forEach { alert ->
-            val updated = alert.copy(seen = true, triggeredAt = now)
-            dao.update(updated)
-        }
 
+        fired.forEach { alert ->
+            if (alert.triggeredAt == null) {
+                val updated = alert.copy(triggeredAt = now)
+                dao.update(updated)
+            }
+        }
         fired
     }
 
