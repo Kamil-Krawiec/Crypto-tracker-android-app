@@ -12,7 +12,8 @@ import androidx.navigation.navDeepLink
 import com.example.cryptotracker.ui.dashboard.DashboardScreen
 import com.example.cryptotracker.ui.home.HomeScreen
 import com.example.cryptotracker.ui.alertDetail.AlertDetailScreen
-import com.example.cryptotracker.ui.dashboard.AssetDetailScreen
+import com.example.cryptotracker.ui.assetDetail.EditPurchaseScreen
+import com.example.cryptotracker.ui.assetDetail.AssetDetailScreen
 import com.example.cryptotracker.ui.makeAlert.MakeAlertScreen
 import com.example.cryptotracker.ui.notifications.NotificationsScreen
 import com.example.cryptotracker.ui.portfolio.AddAssetScreen
@@ -27,8 +28,13 @@ sealed class Screen(val route: String) {
         fun createRoute(alertId: Long) = "alert_detail/$alertId"
     }
 
+
     object AssetDetail : Screen("assetDetail/{symbol}") {
         fun createRoute(symbol: String) = "assetDetail/$symbol"
+    }
+
+    object EditPurchase : Screen("edit_purchase/{purchaseId}") {
+        fun createRoute(id: Long) = "edit_purchase/$id"
     }
 }
 
@@ -79,17 +85,32 @@ fun NavGraph(
             )
         }
 
+        // asset detail
         composable(
-            route = Screen.AssetDetail.route,
-            arguments = listOf(navArgument("symbol") { type = NavType.StringType })
-        ) { backStackEntry ->
-            val sym = backStackEntry.arguments!!.getString("symbol")!!
+            Screen.AssetDetail.route,
+            arguments = listOf(navArgument("symbol"){ type = NavType.StringType })
+        ) { back ->
+            val sym = back.arguments!!.getString("symbol")!!
             AssetDetailScreen(
-                symbol = sym,
-                onBack = { navController.popBackStack() }
+                symbol   = sym,
+                onBack   = { navController.popBackStack() },
+                onEdit   = { id -> navController.navigate(Screen.EditPurchase.createRoute(id)) },
+                onDelete = { item -> /* call your VM delete here */ }
             )
         }
 
+//        Edit purchase screen
+        composable(
+            Screen.EditPurchase.route,
+            arguments = listOf(navArgument("purchaseId"){ type = NavType.LongType })
+        ) { back ->
+            val id = back.arguments!!.getLong("purchaseId")
+            EditPurchaseScreen(
+                purchaseId = id,
+                onBack     = { navController.popBackStack() },
+                onSaved    = { navController.popBackStack() }
+            )
+        }
         // Alert detail / edit, via deep link or navigation
         composable(
             route = Screen.AlertDetail.route,

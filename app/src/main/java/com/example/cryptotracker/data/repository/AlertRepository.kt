@@ -24,16 +24,6 @@ class AlertRepository @Inject constructor(
     fun getAllAlerts(): Flow<List<PriceAlert>> =
         dao.getAllAlertsFlow()
 
-    /** One-time load of all alerts **/
-    suspend fun getAllAlertsOnce(): List<PriceAlert> =
-        withContext(Dispatchers.IO) {
-            dao.getAllAlertsOnce()
-        }
-
-    /** Count of unseen alerts **/
-    fun getUnseenAlertCount(): Flow<Int> =
-        dao.getUnseenCountFlow()
-
     /** Insert or update an alert, returns the row ID **/
     suspend fun upsertAlert(alert: PriceAlert): Long =
         withContext(Dispatchers.IO) {
@@ -71,7 +61,7 @@ class AlertRepository @Inject constructor(
             pricesMap["${alert.symbol.uppercase()}USDT"]?.let { price ->
                 if (alert.isAboveThreshold) price >= alert.targetPrice
                 else price <= alert.targetPrice
-            } ?: false
+            } == true
         }
 
         // 3. Update each fired alert: mark seen & set triggeredAt
