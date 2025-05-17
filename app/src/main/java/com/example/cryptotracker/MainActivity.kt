@@ -23,14 +23,12 @@ class MainActivity : ComponentActivity() {
         if (granted) {
             schedulePriceChecks()
         }
-        // if not granted, you might show a dialog or disable alerts UI
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // If on Android 13+ ask for POST_NOTIFICATIONS, otherwise start right away
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             when {
                 ContextCompat.checkSelfPermission(
