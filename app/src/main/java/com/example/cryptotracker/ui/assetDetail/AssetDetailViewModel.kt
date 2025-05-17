@@ -1,19 +1,17 @@
 // app/src/main/java/com/example/cryptotracker/ui/dashboard/AssetDetailViewModel.kt
-package com.example.cryptotracker.ui.dashboard
+package com.example.cryptotracker.ui.assetDetail
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.cryptotracker.data.entity.CryptoAsset
 import com.example.cryptotracker.data.repository.CryptoRepository
-import com.example.cryptotracker.ui.assetDetail.PurchaseItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import java.time.Instant
 
 @HiltViewModel
 class AssetDetailViewModel @Inject constructor(
