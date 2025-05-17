@@ -1,14 +1,13 @@
-// app/src/main/java/com/example/cryptotracker/ui/notifications/NotificationsScreen.kt
 package com.example.cryptotracker.ui.notifications
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material.icons.Icons
@@ -41,7 +40,6 @@ fun NotificationsScreen(
         AlertFilter.Triggered -> alerts.filter { it.triggeredAt != null }
     }
 
-
     Scaffold(
         topBar = {
             TopAppBar(
@@ -59,8 +57,11 @@ fun NotificationsScreen(
             }
         }
     ) { padding ->
-        Column(Modifier.fillMaxSize().padding(padding)) {
-
+        Column(
+            Modifier
+                .fillMaxSize()
+                .padding(padding)
+        ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -84,7 +85,6 @@ fun NotificationsScreen(
                 )
             }
 
-
             LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
@@ -98,9 +98,8 @@ fun NotificationsScreen(
                         MaterialTheme.colorScheme.surface
 
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(background)
+                        colors   = CardDefaults.cardColors(containerColor = background),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
                             Modifier
@@ -109,7 +108,7 @@ fun NotificationsScreen(
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Column(
-                                modifier = Modifier
+                                Modifier
                                     .weight(1f)
                                     .clickable {
                                         if (alert.triggeredAt != null && !alert.seen) {

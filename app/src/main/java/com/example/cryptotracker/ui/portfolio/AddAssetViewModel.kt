@@ -8,49 +8,45 @@ import androidx.lifecycle.viewModelScope
 import com.example.cryptotracker.data.entity.CryptoAsset
 import com.example.cryptotracker.data.repository.CryptoRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import java.time.Instant
 import javax.inject.Inject
-
-data class AddAssetUiState(
-    val symbol: String    = "",
-    val qtyText: String   = "",
-    val priceText: String = ""
-) {
-    val qty: Double?   get() = qtyText.toDoubleOrNull()
-    val price: Double? get() = priceText.toDoubleOrNull()
-    val isValid: Boolean
-        get() = symbol.isNotBlank() && qty != null && price != null
-}
 
 @HiltViewModel
 class AddAssetViewModel @Inject constructor(
     private val repo: CryptoRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow(AddAssetUiState())
-    val uiState: StateFlow<AddAssetUiState> = _uiState
 
-    fun onSymbolChange(s: String)   = _uiState.update { it.copy(symbol = s.uppercase()) }
-    fun onQtyChange(q: String)      = _uiState.update { it.copy(qtyText = q) }
-    fun onPriceChange(p: String)    = _uiState.update { it.copy(priceText = p) }
-
+    /**
+     * @param explicitPrice     user‐entered price, or null to fetch historical
+     * @param purchaseTimestamp when the asset was bought; if null, defaults to now
+     */
     @RequiresApi(Build.VERSION_CODES.O)
-    fun saveAsset() {
-        val st = _uiState.value
-        if (st.isValid) {
-            viewModelScope.launch {
-                repo.upsertAsset(
-                    CryptoAsset(
-                        symbol             = st.symbol,
-                        quantity           = st.qty!!,
-                        purchasePrice      = st.price!!,
-                        purchaseTimestamp  = Instant.now(),
-                        name               = "",
-                        imageUrl           = null
-                    )
-                )
-            }
+    fun saveAsset(
+        symbol: String,
+        name: String,
+        quantity: Double,
+        explicitPrice: Double?,
+        purchaseTimestamp: Instant? = null,
+        imageUrl: String?,
+    ) {
+        viewModelScope.launch {
+            // choose timestamp: passed in or now
+            val ts = purchaseTimestamp ?: Instant.now()
+
+            // choose price: explicit or historical at that ts
+            val price = explicitPrice
+                ?: repo.getHistoricalPrice(symbol.uppercase(), ts)
+
+            val asset = CryptoAsset(
+                symbol            = symbol.uppercase(),
+                name              = name,
+                quantity          = quantity,
+                purchasePrice     = price,
+                purchaseTimestamp = ts,
+                imageUrl          = imageUrl
+            )
+            repo.upsertAsset(asset)
         }
     }
 }

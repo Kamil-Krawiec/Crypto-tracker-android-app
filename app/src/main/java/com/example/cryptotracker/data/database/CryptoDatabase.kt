@@ -11,7 +11,7 @@ import com.example.cryptotracker.data.entity.PriceAlert
 
 @Database(
     entities = [CryptoAsset::class, PriceAlert::class],
-    version = 3,
+    version = 2,
     exportSchema = false
 )
 @TypeConverters(Converters::class)

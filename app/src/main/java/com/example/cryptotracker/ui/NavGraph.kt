@@ -12,6 +12,7 @@ import androidx.navigation.navDeepLink
 import com.example.cryptotracker.ui.dashboard.DashboardScreen
 import com.example.cryptotracker.ui.home.HomeScreen
 import com.example.cryptotracker.ui.alertDetail.AlertDetailScreen
+import com.example.cryptotracker.ui.dashboard.AssetDetailScreen
 import com.example.cryptotracker.ui.makeAlert.MakeAlertScreen
 import com.example.cryptotracker.ui.notifications.NotificationsScreen
 import com.example.cryptotracker.ui.portfolio.AddAssetScreen
@@ -24,6 +25,10 @@ sealed class Screen(val route: String) {
     object AddAsset : Screen("add_asset")
     object AlertDetail : Screen("alert_detail/{alertId}") {
         fun createRoute(alertId: Long) = "alert_detail/$alertId"
+    }
+
+    object AssetDetail : Screen("assetDetail/{symbol}") {
+        fun createRoute(symbol: String) = "assetDetail/$symbol"
     }
 }
 
@@ -40,20 +45,23 @@ fun NavGraph(
 
         composable(Screen.Home.route) {
             HomeScreen(
-                onAlertsClick      = { navController.navigate(Screen.Notifications.route) },
-                onPortfolioClick   = { navController.navigate(Screen.Dashboard.route) }
+                onAlertsClick = { navController.navigate(Screen.Notifications.route) },
+                onPortfolioClick = { navController.navigate(Screen.Dashboard.route) }
             )
         }
         // Portfolio screen
         composable(Screen.Dashboard.route) {
             DashboardScreen(
                 onBack = { navController.popBackStack() },
-                onAdd = { navController.navigate(Screen.AddAsset.route) }
+                onAdd  = { navController.navigate(Screen.AddAsset.route) },
+                onSymbolClick = { sym ->
+                    navController.navigate("assetDetail/$sym")
+                }
             )
         }
         composable(Screen.AddAsset.route) {
             AddAssetScreen(
-                onDone = { navController.popBackStack() }
+                onSaved = { navController.popBackStack() }
             )
         }
         // Alerts list
@@ -70,6 +78,18 @@ fun NavGraph(
                 onDone = { navController.popBackStack() }
             )
         }
+
+        composable(
+            route = Screen.AssetDetail.route,
+            arguments = listOf(navArgument("symbol") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val sym = backStackEntry.arguments!!.getString("symbol")!!
+            AssetDetailScreen(
+                symbol = sym,
+                onBack = { navController.popBackStack() }
+            )
+        }
+
         // Alert detail / edit, via deep link or navigation
         composable(
             route = Screen.AlertDetail.route,

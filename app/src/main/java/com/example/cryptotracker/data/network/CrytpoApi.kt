@@ -14,18 +14,19 @@ interface CryptoApi {
     @GET("api/v3/ticker/price")
     suspend fun getAllPrices(): List<TickerResponse>
 
-    /** Historical candlesticks (OHLC) **/
+    /**
+     * Fetch OHLC bars.  If you pass startTime (ms since epoch) and limit=1,
+     * you’ll get exactly the bar that includes that timestamp.
+     */
     @GET("api/v3/klines")
     suspend fun getCandlesticks(
         @Query("symbol") symbol: String,
         @Query("interval") interval: String,
-        @Query("limit") limit: Int = 100
+        @Query("limit") limit: Int = 100,
+        @Query("startTime") startTime: Long? = null,
+        @Query("endTime")   endTime:   Long? = null
     ): List<List<String>>
 
-    /** Order book (bids & asks) **/
-    @GET("api/v3/depth")
-    suspend fun getOrderBook(
-        @Query("symbol") symbol: String,
-        @Query("limit") limit: Int = 100
-    ): OrderBookResponse
+
+
 }

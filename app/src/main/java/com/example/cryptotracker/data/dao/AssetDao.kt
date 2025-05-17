@@ -31,6 +31,9 @@ interface AssetDao {
         upsertAll(assets)
     }
 
+    @Query("SELECT * FROM assets WHERE symbol = :symbol ORDER BY purchaseTimestamp DESC")
+    fun getPurchasesFor(symbol: String): Flow<List<CryptoAsset>>
+
     @Query("DELETE FROM assets")
     suspend fun deleteAll(): Int
 }
