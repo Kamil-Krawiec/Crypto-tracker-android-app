@@ -10,7 +10,7 @@ interface AlertDao {
     @Query("SELECT * FROM alerts ORDER BY createdAt DESC")
     fun getAllAlertsFlow(): Flow<List<PriceAlert>>
 
-    @Query("SELECT * FROM alerts ORDER BY createdAt DESC")
+    @Query("SELECT * FROM alerts WHERE seen = 0 ORDER BY createdAt  DESC")
     suspend fun getAllAlertsOnce(): List<PriceAlert>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
